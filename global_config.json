@@ -1,0 +1,34 @@
+{
+  "llm_api_url": "http://localhost:1234/v1/chat/completions",
+  "llm_api_key": "not-needed",
+  "llm_prompt_template": "You are an AI assistant for a book illustrator. Your task is to read the following passage and describe the most visually compelling moment in a single, descriptive sentence. Do not add any conversational filler, introductory text, or quotation marks. Just provide the sentence itself. The passage is: <text>",
+  "llm_parsing_config": {
+    "strip_code_fences": true,
+    "ignore_lines_starting_with": []
+  },
+  "default_settings": {
+    "forge_api_url": "http://127.0.0.1:7860/sdapi/v1/txt2img",
+    "prompt_prefix": "<lora:HyperdetailedColoredPencilV2:1.0>, ArsMJStyle, Colored pencil hyperdetailed realism, ",
+    "postprocess_upscaling": {
+      "enabled": true,
+      "upscaler": "4xUltrasharp",
+      "scale_by": 2
+    },
+    "api_payload": {
+      "prompt": "",
+      "negative_prompt": "blurry, bad quality, text, watermark, signature",
+      "seed": -1,
+      "sampler_name": "Euler a",
+      "steps": 20,
+      "cfg_scale": 7,
+      "width": 1344,
+      "height": 768,
+      "restore_faces": false,
+      "override_settings": {
+        "sd_model_checkpoint": "juggernautXL_juggXILightningByRD.safensors",
+        "sd_vae": "sdxlVAE_sdxlVAE.safensors"
+      },
+      "override_settings_restore_afterwards": false
+    }
+  }
+}
