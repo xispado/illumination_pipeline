@@ -1,20 +1,36 @@
 {
   "llm_api_url": "http://localhost:1234/v1/chat/completions",
   "llm_api_key": "not-needed",
-  "llm_model_name": "qwen/qwen3-4b-2507",
+  "llm_model_name": "loaded-model-name.gguf",
   "llm_concurrent_requests": 8,
   "llm_chunk_size_words": 350,
-  "llm_prompt_template": "prompt_template.txt",
+  "llm_prompt_template_file": "prompt_template.txt",
   "llm_parsing_config": {
     "strip_code_fences": true,
     "ignore_lines_starting_with": []
   },
   "default_settings": {
+    "image_generator_type": "comfyui",
     "forge_api_url": "http://127.0.0.1:7860/sdapi/v1/txt2img",
-    "prompt_prefix": "<lora:HyperdetailedColoredPencilV2:1.0>, ArsMJStyle, Colored pencil hyperdetailed realism, ",
-    "postprocess_upscaling": {
+    "comfyui_api_address": "127.0.0.1:8188",
+    "comfyui_path": "F:/AI/ComfyUI/ComfyUI",
+    "comfyui_workflow_file": "Comfy_Workflows/comfy_workflow_api.json",
+    "comfyui_upscale_workflow_file": "Comfy_Workflows/comfy_upscale_workflow_api.json",
+
+    "comfyui_overrides": {
       "enabled": true,
-      "upscaler": "4xUltrasharp",
+      "ckpt_name": "juggernautXL_juggXILightningByRD.safetensors",
+      "width": 1344,
+      "height": 768,
+      "steps": 20,
+      "cfg": 7,
+      "sampler_name": "euler",
+      "scheduler": "normal"
+    },
+
+    "prompt_prefix": "ArsMJStyle, Colored pencil hyperdetailed realism, ",
+    "postprocess_upscaling": {
+      "upscaler": "4xUltrasharpV10.pth",
       "scale_by": 2
     },
     "api_payload": {
@@ -28,10 +44,9 @@
       "height": 768,
       "restore_faces": false,
       "override_settings": {
-        "sd_model_checkpoint": "juggernautXL_juggXILightningByRD.safensors",
-        "sd_vae": "sdxlVAE_sdxlVAE.safensors"
-      },
-      "override_settings_restore_afterwards": false
+        "sd_model_checkpoint": "juggernautXL_juggXILightningByRD.safetensors",
+        "sd_vae": "sdxlVAE_sdxlVAE.safetensors"
+      }
     }
   }
 }

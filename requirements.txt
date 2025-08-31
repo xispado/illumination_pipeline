@@ -3,3 +3,4 @@ pandas
 ebooklib
 beautifulsoup4
 tqdm
+websocket-client

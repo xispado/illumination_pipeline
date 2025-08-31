@@ -1,0 +1,37 @@
+{
+  "1": {
+    "inputs": {
+      "model_name": "R-ESRGAN 4x+.pth"
+    },
+    "class_type": "UpscaleModelLoader"
+  },
+  "2": {
+    "inputs": {
+      "upscale_model": [
+        "1",
+        0
+      ],
+      "image": [
+        "3",
+        0
+      ]
+    },
+    "class_type": "ImageUpscaleWithModel"
+  },
+  "3": {
+    "inputs": {
+      "image": "placeholder_image.png"
+    },
+    "class_type": "LoadImage"
+  },
+  "4": {
+    "inputs": {
+      "filename_prefix": "Upscaled",
+      "images": [
+        "2",
+        0
+      ]
+    },
+    "class_type": "SaveImage"
+  }
+}

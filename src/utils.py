@@ -24,3 +24,17 @@ def open_folder_in_explorer(path):
             subprocess.call(["xdg-open", path])
     except Exception as e:
         print(f"  -> ERROR: Could not open folder. {e}")
+
+# NEW FUNCTION to open a specific file
+def open_file(file_path):
+    """Opens a specific file in the default application."""
+    print(f"Opening file: {file_path}")
+    try:
+        if sys.platform == "win32":
+            os.startfile(os.path.realpath(file_path))
+        elif sys.platform == "darwin":
+            subprocess.call(["open", file_path])
+        else:
+            subprocess.call(["xdg-open", file_path])
+    except Exception as e:
+        print(f"  -> ERROR: Could not open file. {e}")

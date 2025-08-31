@@ -2,7 +2,7 @@
 import os
 import sys
 
-# Import functions from our new modules
+# Local imports
 from src.project_manager import (
     ensure_project_folders_exist,
     find_projects,
@@ -11,110 +11,88 @@ from src.project_manager import (
 )
 from src.llm_handler import run_single_text_test_suite, run_chunking_test_suite, generate_prompts_for_project
 from src.image_generator import run_image_generation, run_upscaling_process
+from src.utils import Colors, open_folder_in_explorer, open_file
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def press_enter_to_continue():
-    input("\nPress Enter to return to the menu...")
+    input("\nPress Enter to return...")
 
 def handle_import_new_book():
     clear_screen()
-    epubs = find_importable_epubs()
-    if not epubs:
-        print("No new .epub files found in the 'Books' directory.")
-        press_enter_to_continue()
-        return
-
     print("=== Import New Book ===")
-    for i, epub in enumerate(epubs):
-        print(f"[{i+1}] {epub}")
-    print("\n(B)ack to Main Menu")
+    epubs = find_importable_epubs()
     
-    choice = input("Select an EPUB to import: ").lower()
-    if choice == 'b': return
+    if epubs:
+        print("Found the following new books in the 'Books' folder:")
+        for i, epub in enumerate(epubs): print(f"[{i+1}] {epub}")
+    else:
+        print(f"\n{Colors.YELLOW}No new .epub files found in the 'Books' folder.{Colors.ENDC}")
+        print("Add your .epub files there to get started.")
+
+    print("\n---------------------------")
+    print("(O)pen 'Books' Folder")
+    print("(B)ack to Main Menu")
+    
+    choice = input("\nSelect a book to import or an option: ").lower()
+    if choice == 'b': return None
+    if choice == 'o':
+        open_folder_in_explorer("Books")
+        press_enter_to_continue()
+        return "refresh" # Special signal to re-run this menu
 
     try:
         index = int(choice) - 1
         if 0 <= index < len(epubs):
-            create_project_structure(epubs[index])
+            return create_project_structure(epubs[index])
         else:
             print("Invalid selection.")
     except (ValueError, IndexError):
         print("Invalid input.")
+    
     press_enter_to_continue()
+    return None
 
 def handle_single_image(project_path):
-    print("\n--- Generate Single Fill-in Image ---")
-    print("Enter details in the format: chapter_number: your prompt here")
-    user_input = input("Example -> 04: a beautiful spaceship landing on a red planet\n> ")
-    
-    try:
-        # Split on the first colon. This is more flexible than a comma.
-        parts = user_input.split(':', 1)
-        if len(parts) != 2:
-            raise ValueError("Input must contain a colon ':' to separate chapter and prompt.")
-
-        chapter_part, prompt_part = parts
+    while True:
+        clear_screen()
+        print("--- Generate Single Fill-in Image ---")
+        print("Enter details in the format: chapter_number: your prompt here")
+        user_input = input("Example -> 04: a beautiful spaceship landing on a red planet\n> ")
+        try:
+            parts = user_input.split(':', 1)
+            if len(parts) != 2: raise ValueError("Input must contain a colon ':'")
+            chapter_num = int(parts[0].strip())
+            prompt_part = parts[1].strip()
+            if not prompt_part: raise ValueError("Prompt cannot be empty.")
+            run_image_generation(project_path, single_image_details=(chapter_num, prompt_part))
+        except (ValueError, IndexError) as e:
+            print(f"\n{Colors.RED}Invalid format. Please try again. ({e}){Colors.ENDC}")
         
-        # Simply strip whitespace and convert to int. Much cleaner.
-        chapter_num = int(chapter_part.strip())
-        
-        run_image_generation(project_path, single_image_details=(chapter_num, prompt_part.strip()))
-
-    except (ValueError, IndexError) as e:
-        print(f"\nInvalid format. Please try again. ({e})")
-    
-    press_enter_to_continue()
-    
-def handle_chunking_test():
-    clear_screen()
-    print("--- Chunking & Prompt Test Suite ---")
-    projects = find_projects()
-    if not projects:
-        print("No projects found. Please import a book first.")
-        press_enter_to_continue()
-        return
-
-    print("\nSelect a project to test against:")
-    for i, (name, path) in enumerate(projects):
-        print(f"[{i+1}] {name}")
-    
-    try:
-        proj_choice = input("\nProject number: ")
-        proj_index = int(proj_choice) - 1
-        if not (0 <= proj_index < len(projects)):
-            print("Invalid project selection."); press_enter_to_continue(); return
-        
-        project_path = projects[proj_index][1]
-
-        num_chunks_str = input("How many chunks from the beginning of the book would you like to test? ")
-        num_chunks = int(num_chunks_str)
-        if num_chunks <= 0:
-            print("Please enter a positive number."); press_enter_to_continue(); return
-
-        run_chunking_test_suite(project_path, num_chunks)
-
-    except (ValueError, IndexError):
-        print("Invalid input.")
-    press_enter_to_continue()
-
+        another = input("\nGenerate another fill-in image? (y/n): ").lower()
+        if another != 'y': break
 
 def handle_project_menu(project_name, project_path):
     while True:
         clear_screen()
-        print(f"=== Project: {project_name} ===")
+        print(f"=== Project: {Colors.CYAN}{project_name}{Colors.ENDC} ===")
         
+        # Load the config here to check the generator type
+        from src.config_manager import load_project_config
+        config = load_project_config(project_path)
+        is_comfy_project = config.get("image_generator_type") == "comfyui"
+
         prompts_exist = os.path.exists(os.path.join(project_path, f"{project_name}_prompts.csv"))
         
         if not prompts_exist:
             print("Status: Ready for Prompt Generation.")
             print("\n[1] Generate prompts from book text")
+            print("(O)pen Project Folder")
             print("(B)ack to Main Menu")
             choice = input("\nSelect an option: ").lower()
-            if choice == '1':
-                generate_prompts_for_project(project_path)
-                press_enter_to_continue()
+            if choice == '1': generate_prompts_for_project(project_path); press_enter_to_continue()
+            elif choice == 'o': open_folder_in_explorer(project_path); press_enter_to_continue()
             elif choice == 'b': return
         else:
             print("Status: Ready for Image Generation.")
@@ -122,52 +100,87 @@ def handle_project_menu(project_name, project_path):
             print("[2] Generate a single fill-in image")
             print("[3] Upscale generated images")
             print("---------------------------")
+            print("(O)pen Project Folder")
+            if is_comfy_project:
+                print(f"(C)lean up ComfyUI Output Folder") # <-- DYNAMIC OPTION
             print("(R)e-run prompt generation (deletes existing prompts)")
             print("(B)ack to Main Menu")
             choice = input("\nSelect an option: ").lower()
 
-            if choice == '1':
-                run_image_generation(project_path)
-                press_enter_to_continue()
-            elif choice == '2':
-                handle_single_image(project_path)
-            elif choice == '3':
-                run_upscaling_process(project_path)
+            if choice == '1': run_image_generation(project_path); press_enter_to_continue()
+            elif choice == '2': handle_single_image(project_path)
+            elif choice == '3': run_upscaling_process(project_path); press_enter_to_continue()
+            elif choice == 'o': open_folder_in_explorer(project_path); press_enter_to_continue()
+            elif choice == 'c' and is_comfy_project:
+                # We need to import the new function to call it
+                from src.project_manager import cleanup_comfyui_output_for_project
+                cleanup_comfyui_output_for_project(project_path, config)
                 press_enter_to_continue()
             elif choice == 'r':
                 if input("Are you sure? (y/n): ").lower() == 'y':
                     os.remove(os.path.join(project_path, f"{project_name}_prompts.csv"))
             elif choice == 'b': return
 
+def handle_testing_menu():
+    while True:
+        clear_screen()
+        print("--- Testing Suites ---")
+        print("\n[1] Chunking & Prompt Test (Live Data)")
+        print("[2] Single Text Test (from llm_test_input.txt)")
+        print("(B)ack to Main Menu")
+        choice = input("\nSelect a test to run: ").lower()
+        if choice == '1': handle_chunking_test()
+        elif choice == '2': run_single_text_test_suite(); press_enter_to_continue()
+        elif choice == 'b': return
+
+def handle_chunking_test():
+    clear_screen()
+    print("--- Chunking & Prompt Test ---")
+    projects = find_projects()
+    if not projects: print("No projects found. Please import a book first."); press_enter_to_continue(); return
+    print("\nSelect a project to test against:")
+    for i, (name, path) in enumerate(projects): print(f"[{i+1}] {name}")
+    try:
+        proj_index = int(input("\nProject number: ")) - 1
+        if not (0 <= proj_index < len(projects)): raise IndexError
+        project_path = projects[proj_index][1]
+        num_chunks = int(input("How many chunks from the book would you like to test? "))
+        if num_chunks <= 0: raise ValueError("Please enter a positive number.")
+        run_chunking_test_suite(project_path, num_chunks)
+    except (ValueError, IndexError):
+        print("Invalid input.")
+    press_enter_to_continue()
+
 def main():
-    os.system("")
+    os.system("") # Enable ANSI colors on Windows
     ensure_project_folders_exist()
     while True:
         clear_screen()
-        print("=== Illumination Pipeline V2 ===")
+        print(f"{Colors.BOLD}=== Illumination Pipeline V2 ==={Colors.ENDC}")
         projects = find_projects()
-        
         if projects:
             print("\nExisting Illuminations:")
-            for i, (name, path) in enumerate(projects):
-                print(f"[{i+1}] {name}")
+            for i, (name, path) in enumerate(projects): print(f"[{i+1}] {name}")
         else:
             print("\nNo projects found.")
-
         print("\n---------------------------")
         print("(I)mport New Book from 'Books' folder")
-        print("\n--- Testing Suites ---")
-        print("(C)hunking & Prompt Test (Live Data)")
-        print("(S)ingle Text Test (llm_test_input.txt)")
-        print("\n(Q)uit")
-
+        print("(T)esting Suites")
+        print("(G)lobal Settings (config file)")
+        print("(Q)uit")
         choice = input("\nSelect a project or an option: ").lower()
 
         if choice == 'q': break
-        elif choice == 'i': handle_import_new_book()
-        elif choice == 'c': handle_chunking_test()
-        elif choice == 's': 
-            run_single_text_test_suite()
+        elif choice == 'i': 
+            result = handle_import_new_book()
+            while result == "refresh": # Loop back if user opened folder
+                result = handle_import_new_book()
+            if result:
+                press_enter_to_continue()
+                handle_project_menu(*result)
+        elif choice == 't': handle_testing_menu()
+        elif choice == 'g':
+            open_file('global_config.json')
             press_enter_to_continue()
         else:
             try:
