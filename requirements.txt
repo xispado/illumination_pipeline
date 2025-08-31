@@ -2,3 +2,4 @@ requests
 pandas
 ebooklib
 beautifulsoup4
+tqdm

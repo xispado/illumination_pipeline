@@ -15,8 +15,7 @@ try:
     import msvcrt
     class KeyPressListener:
         def __init__(self, interrupt_key='x'):
-            self.interrupt_key = interrupt_key.lower()
-            self.key_pressed = None
+            self.interrupt_key = interrupt_key.lower(); self.key_pressed = None
             self._thread = threading.Thread(target=self._listen, daemon=True)
             self._stop_event = threading.Event()
         def _listen(self):
@@ -32,8 +31,7 @@ except ImportError:
     import sys, select, tty, termios
     class KeyPressListener:
         def __init__(self, interrupt_key='x'):
-            self.interrupt_key = interrupt_key.lower()
-            self.key_pressed = None
+            self.interrupt_key = interrupt_key.lower(); self.key_pressed = None
             self._thread = threading.Thread(target=self._listen, daemon=True)
             self._stop_event = threading.Event()
         def _listen(self):
@@ -49,7 +47,6 @@ except ImportError:
         def stop(self): self._stop_event.set()
         def is_interrupt_pressed(self): return self.key_pressed == self.interrupt_key
 
-
 def _create_filename_base_from_prompt(prompt_text):
     first_words = prompt_text.split()[:6]
     base = "_".join(first_words)
@@ -58,28 +55,17 @@ def _create_filename_base_from_prompt(prompt_text):
 def run_image_generation(project_path, single_image_details=None):
     """Runs the image generation process."""
     config = load_project_config(project_path)
-    project_name = os.path.basename(project_path).replace("_Illumination_Project", "")
+    project_name = os.path.basename(project_path)
     csv_path = os.path.join(project_path, f"{project_name}_prompts.csv")
     images_folder = os.path.join(project_path, "images")
     os.makedirs(images_folder, exist_ok=True)
 
-    if not os.path.exists(csv_path):
+    if not single_image_details and not os.path.exists(csv_path):
         print(f"ERROR: Prompts file not found at '{csv_path}'.")
         return
 
-    if not single_image_details:
-        try:
-            print("\n--- Pre-flight Check: Setting persistent model and VAE ---")
-            options_url = config['forge_api_url'].replace('txt2img', 'options')
-            settings = config['api_payload'].get('override_settings', {})
-            response = requests.post(url=options_url, json=settings)
-            response.raise_for_status()
-            print("Server state set successfully.")
-        except requests.RequestException as e:
-            print(f"  -> ERROR: Could not set active model via API. Details: {e}")
-        except KeyError as e:
-            print(f"  -> WARNING: Could not find override_settings in config.")
-    
+    # The entire "Pre-flight Check" block has been removed.
+
     rows_to_process = []
     if single_image_details:
         chapter, prompt_text = single_image_details
@@ -114,6 +100,8 @@ def run_image_generation(project_path, single_image_details=None):
                 continue
 
             print(f"\nGenerating image for Chapter {item['chapter']}, Scene {item['scene']}: {item['filename']}")
+            # The payload is now a simple deep copy. The override_settings for model and VAE
+            # are included in every call, which is more reliable.
             payload = copy.deepcopy(config["api_payload"])
             payload["prompt"] = config.get("prompt_prefix", "") + item['prompt']
             
@@ -176,17 +164,12 @@ def _upscale_single_image(source_path, target_path, config):
     with open(source_path, 'rb') as img_file:
         encoded_image = base64.b64encode(img_file.read()).decode('utf-8')
     
-    payload = {
-        "image": encoded_image,
-        "upscaling_resize": settings.get("scale_by", 2.0),
-        "upscaler_1": settings.get("upscaler", "None"),
-    }
+    payload = {"image": encoded_image, "upscaling_resize": settings.get("scale_by", 2.0), "upscaler_1": settings.get("upscaler", "None")}
     
     try:
         response = requests.post(url=url, json=payload)
         response.raise_for_status()
         r = response.json()
-        
         if 'image' in r:
             upscaled_data = base64.b64decode(r['image'])
             with open(target_path, 'wb') as f: f.write(upscaled_data)

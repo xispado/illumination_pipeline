@@ -1,10 +1,7 @@
 {
   "llm_api_url": "http://localhost:1234/v1/chat/completions",
   "llm_api_key": "not-needed",
-  "llm_model_name": "qwen/qwen3-4b-2507",
-  "llm_concurrent_requests": 8,
-  "llm_chunk_size_words": 350,
-  "llm_prompt_template": "prompt_template.txt",
+  "llm_prompt_template": "You are an AI assistant for a book illustrator. Your task is to read the following passage and describe the most visually compelling moment in a single, descriptive sentence. Do not add any conversational filler, introductory text, or quotation marks. Just provide the sentence itself. The passage is: <text>",
   "llm_parsing_config": {
     "strip_code_fences": true,
     "ignore_lines_starting_with": []

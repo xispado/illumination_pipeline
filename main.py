@@ -9,7 +9,7 @@ from src.project_manager import (
     find_importable_epubs,
     create_project_structure,
 )
-from src.llm_handler import run_llm_test_suite, generate_prompts_for_project
+from src.llm_handler import run_single_text_test_suite, run_chunking_test_suite, generate_prompts_for_project
 from src.image_generator import run_image_generation, run_upscaling_process
 
 def clear_screen():
@@ -46,14 +46,59 @@ def handle_import_new_book():
 
 def handle_single_image(project_path):
     print("\n--- Generate Single Fill-in Image ---")
-    user_input = input("Enter details (e.g., ch:04, a beautiful spaceship): ")
+    print("Enter details in the format: chapter_number: your prompt here")
+    user_input = input("Example -> 04: a beautiful spaceship landing on a red planet\n> ")
+    
     try:
-        chapter_part, prompt_part = user_input.split(',', 1)
-        chapter_num = int(chapter_part.lower().replace("ch:", "").strip())
+        # Split on the first colon. This is more flexible than a comma.
+        parts = user_input.split(':', 1)
+        if len(parts) != 2:
+            raise ValueError("Input must contain a colon ':' to separate chapter and prompt.")
+
+        chapter_part, prompt_part = parts
+        
+        # Simply strip whitespace and convert to int. Much cleaner.
+        chapter_num = int(chapter_part.strip())
+        
         run_image_generation(project_path, single_image_details=(chapter_num, prompt_part.strip()))
-    except (ValueError, IndexError):
-        print("\nInvalid format. Please try again.")
+
+    except (ValueError, IndexError) as e:
+        print(f"\nInvalid format. Please try again. ({e})")
+    
     press_enter_to_continue()
+    
+def handle_chunking_test():
+    clear_screen()
+    print("--- Chunking & Prompt Test Suite ---")
+    projects = find_projects()
+    if not projects:
+        print("No projects found. Please import a book first.")
+        press_enter_to_continue()
+        return
+
+    print("\nSelect a project to test against:")
+    for i, (name, path) in enumerate(projects):
+        print(f"[{i+1}] {name}")
+    
+    try:
+        proj_choice = input("\nProject number: ")
+        proj_index = int(proj_choice) - 1
+        if not (0 <= proj_index < len(projects)):
+            print("Invalid project selection."); press_enter_to_continue(); return
+        
+        project_path = projects[proj_index][1]
+
+        num_chunks_str = input("How many chunks from the beginning of the book would you like to test? ")
+        num_chunks = int(num_chunks_str)
+        if num_chunks <= 0:
+            print("Please enter a positive number."); press_enter_to_continue(); return
+
+        run_chunking_test_suite(project_path, num_chunks)
+
+    except (ValueError, IndexError):
+        print("Invalid input.")
+    press_enter_to_continue()
+
 
 def handle_project_menu(project_name, project_path):
     while True:
@@ -95,6 +140,7 @@ def handle_project_menu(project_name, project_path):
             elif choice == 'b': return
 
 def main():
+    os.system("")
     ensure_project_folders_exist()
     while True:
         clear_screen()
@@ -106,19 +152,22 @@ def main():
             for i, (name, path) in enumerate(projects):
                 print(f"[{i+1}] {name}")
         else:
-            print("\nNo existing projects found.")
+            print("\nNo projects found.")
 
         print("\n---------------------------")
         print("(I)mport New Book from 'Books' folder")
-        print("(T)est LLM Prompt Generation")
-        print("(Q)uit")
+        print("\n--- Testing Suites ---")
+        print("(C)hunking & Prompt Test (Live Data)")
+        print("(S)ingle Text Test (llm_test_input.txt)")
+        print("\n(Q)uit")
 
         choice = input("\nSelect a project or an option: ").lower()
 
         if choice == 'q': break
         elif choice == 'i': handle_import_new_book()
-        elif choice == 't': 
-            run_llm_test_suite()
+        elif choice == 'c': handle_chunking_test()
+        elif choice == 's': 
+            run_single_text_test_suite()
             press_enter_to_continue()
         else:
             try:

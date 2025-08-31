@@ -1,0 +1,72 @@
+# =============================================================================
+# Illumination Pipeline Specific
+# =============================================================================
+# Ignore all personal books and generated project output.
+# This ensures that your personal data is NEVER committed to the repository.
+Books/
+Illuminations/
+
+# It is highly recommended to provide a template for the global config
+# instead of committing the file with your personal API endpoints.
+# To do this:
+#   1. Rename your 'global_config.json' to 'global_config.json.template'
+#   2. Remove any personal API keys or secret information from the template.
+#   3. Add 'global_config.json' to this .gitignore file.
+#   4. Commit the 'global_config.json.template' to your repository.
+# A user will then copy the template to global_config.json and add their own info.
+global_config.json
+
+
+# =============================================================================
+# Python
+# =============================================================================
+# Byte-compiled / optimized / C extensions
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Conda and Virtual Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+
+# =============================================================================
+# General
+# =============================================================================
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor configuration files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+*.log

@@ -10,7 +10,6 @@ from pathlib import Path
 
 from src.config_manager import get_default_project_config
 
-PROJECT_SUFFIX = "_Illumination_Project"
 BOOKS_FOLDER = "Books"
 ILLUMINATIONS_FOLDER = "Illuminations"
 
@@ -20,15 +19,18 @@ def ensure_project_folders_exist():
     os.makedirs(ILLUMINATIONS_FOLDER, exist_ok=True)
 
 def find_projects():
-    """Finds all existing project folders."""
+    """Finds all existing project folders within the Illuminations directory."""
     projects = []
     if not os.path.exists(ILLUMINATIONS_FOLDER):
         return []
+    
     for item in os.listdir(ILLUMINATIONS_FOLDER):
         item_path = os.path.join(ILLUMINATIONS_FOLDER, item)
-        if os.path.isdir(item_path) and item.endswith(PROJECT_SUFFIX):
-            project_name = item.replace(PROJECT_SUFFIX, "")
+        # A directory is considered a project if it has a config.json file
+        if os.path.isdir(item_path) and os.path.exists(os.path.join(item_path, 'config.json')):
+            project_name = item
             projects.append((project_name, item_path))
+            
     return sorted(projects)
 
 def find_importable_epubs():
@@ -48,7 +50,8 @@ def create_project_structure(epub_name):
     """Creates the folder structure and initial files for a new project."""
     epub_path = os.path.join(BOOKS_FOLDER, epub_name)
     book_name = Path(epub_path).stem
-    project_folder = os.path.join(ILLUMINATIONS_FOLDER, f"{book_name}{PROJECT_SUFFIX}")
+    # The project folder now uses the clean book name
+    project_folder = os.path.join(ILLUMINATIONS_FOLDER, book_name)
     images_folder = os.path.join(project_folder, "images")
     
     print(f"Creating new project for '{book_name}'...")
