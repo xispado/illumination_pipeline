@@ -70,3 +70,6 @@ Thumbs.db
 
 # Log files
 *.log
+global_config.json
+Comfy_Workflows/sdxlturbo.json
+global_config.json
