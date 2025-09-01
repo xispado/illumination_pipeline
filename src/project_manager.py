@@ -93,15 +93,18 @@ def create_project_structure(epub_name):
 
     return book_name, project_folder
 
-# --- NEW FUNCTION ---
 def cleanup_comfyui_output_for_project(project_path, config):
     """Safely finds and deletes generated images from the ComfyUI output folder that match this project."""
     clear_screen()
     print("--- ComfyUI Output Cleanup ---")
     
-    comfyui_path = config.get("comfyui_path")
+    # --- THIS IS THE CORRECTED LOGIC ---
+    # It now correctly looks inside the 'comfyui_settings' block first.
+    comfy_settings = config.get("comfyui_settings", {})
+    comfyui_path = comfy_settings.get("comfyui_path")
+
     if not comfyui_path or not os.path.isdir(comfyui_path):
-        print(f"{Colors.RED}ERROR: 'comfyui_path' is not set or is invalid in your config.json.{Colors.ENDC}")
+        print(f"{Colors.RED}ERROR: 'comfyui_path' is not set or is invalid in your project's config.json.{Colors.ENDC}")
         return
 
     comfy_output_dir = os.path.join(comfyui_path, "output")
@@ -128,9 +131,7 @@ def cleanup_comfyui_output_for_project(project_path, config):
     # 2. Find all matching files in the ComfyUI output directory
     files_to_delete = []
     for comfy_file in os.listdir(comfy_output_dir):
-        # The Comfy filename is like "our_prefix_00001.png"
         comfy_basename_with_counter = os.path.splitext(comfy_file)[0]
-        
         for proj_basename in project_basenames:
             if comfy_basename_with_counter.startswith(proj_basename):
                 files_to_delete.append(os.path.join(comfy_output_dir, comfy_file))

@@ -81,7 +81,10 @@ def handle_project_menu(project_name, project_path):
         # Load the config here to check the generator type
         from src.config_manager import load_project_config
         config = load_project_config(project_path)
-        is_comfy_project = config.get("image_generator_type") == "comfyui"
+        
+        # --- THIS IS THE CORRECTED LINE ---
+        # It now correctly looks inside the "common_settings" block.
+        is_comfy_project = config.get("common_settings", {}).get("image_generator_type") == "comfyui"
 
         prompts_exist = os.path.exists(os.path.join(project_path, f"{project_name}_prompts.csv"))
         
@@ -102,7 +105,7 @@ def handle_project_menu(project_name, project_path):
             print("---------------------------")
             print("(O)pen Project Folder")
             if is_comfy_project:
-                print(f"(C)lean up ComfyUI Output Folder") # <-- DYNAMIC OPTION
+                print(f"(C)lean up ComfyUI Output Folder") # <-- This will now appear correctly
             print("(R)e-run prompt generation (deletes existing prompts)")
             print("(B)ack to Main Menu")
             choice = input("\nSelect an option: ").lower()
@@ -112,7 +115,6 @@ def handle_project_menu(project_name, project_path):
             elif choice == '3': run_upscaling_process(project_path); press_enter_to_continue()
             elif choice == 'o': open_folder_in_explorer(project_path); press_enter_to_continue()
             elif choice == 'c' and is_comfy_project:
-                # We need to import the new function to call it
                 from src.project_manager import cleanup_comfyui_output_for_project
                 cleanup_comfyui_output_for_project(project_path, config)
                 press_enter_to_continue()

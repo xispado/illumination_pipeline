@@ -185,6 +185,8 @@ def run_comfyui_image_generation(project_path, config, single_image_details=None
             prompt_workflow = copy.deepcopy(base_workflow)
             for node in prompt_workflow.values():
                 if node["class_type"] == "KSampler": node["inputs"]["seed"] = random.randint(0, 2**32 - 1)
+                if node["class_type"] == "SaveImage":
+                    node["inputs"]["filename_prefix"] = item['filename_prefix']
                 for key, value in node["inputs"].items():
                     if str(value) == "<prompt>": node["inputs"][key] = common.get("prompt_prefix", "") + item['prompt']
                     if str(value) == "<negprompt>": node["inputs"][key] = common.get('negative_prompt', '')
