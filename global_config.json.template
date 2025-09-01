@@ -46,7 +46,7 @@
     "comfyui_settings": {
       "__comment__": "Settings for the ComfyUI backend.",
       "api_address": "127.0.0.1:8188",
-      "comfyui_path": "F:/AI/ComfyUI/ComfyUI",
+      "comfyui_path": "F:/AI/ComfyUI_windows_portable_nvidia/ComfyUI",
       "generation_workflow": "Comfy_Workflows/comfy_workflow_api.json",
       
       "workflow_overrides": {
