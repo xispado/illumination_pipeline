@@ -97,3 +97,66 @@ This pipeline is designed for flexibility. Advanced ComfyUI users can use their 
 5.  Set `comfyui_settings.workflow_overrides.enabled` to `false`.
 
 The script will now load your custom workflow and only inject the prompts, leaving all of your other carefully tuned settings untouched.
+
+---
+
+### A Visual Walk-through
+
+Here is a step-by-step visual guide to the core workflow of the Illumination Pipeline.
+
+#### Step 1: The Main Menu
+When you first launch the application, you'll be greeted by the main menu. It lists any existing projects found in your `Illuminations` folder and provides the main options to get started.
+
+![Main Menu](./docs/screenshots/01MainMenu.png)
+
+#### Step 2: Importing a New Book
+Select `(I)mport New Book` to see a list of available `.epub` files from your `Books` folder. After selecting a book, the pipeline extracts the text and automatically opens the `_clean.txt` file for your review. This is a crucial step to remove any non-story text like title pages or tables of contents.
+
+![Import Menu](./docs/screenshots/03Import.png)
+
+#### Step 3: Generating Prompts
+Once you've cleaned the text and entered the new project's menu, you can generate the image prompts. The application connects to your local LLM, processes the entire book using the chunking settings from your config, and shows a progress bar as it works.
+
+![Generating Prompts](./docs/screenshots/04GeneratePrompts.png)
+
+#### Step 4: The Project Menu
+After prompts have been generated, the project menu updates to show new options for image generation and upscaling. You can also open the project folder directly or clean up the ComfyUI output folder if you're using the ComfyUI backend.
+
+![Project Menu](./docs/screenshots/05ProjectMenu.png)
+
+#### Step 5: Generating Images
+Select `Generate/Continue image generation` to start creating your illustrations. The pipeline will work through your `_prompts.csv` file, sending each prompt to your configured image generation backend. If the process is interrupted, you can run it again, and it will automatically skip the images that have already been created.
+
+![Generating Images](./docs/screenshots/07GenerateImages.png)
+
+**From Batch Generation**
+An example of an image generated during a full book run, based on the style defined in the configuration.
+>A sterile, high-tech laboratory setting with glowing blue holographic interfaces, a sleek PDA floating mid-air, and a series of interconnected neural wires pulsing with faint bioluminescent energy.
+
+![Example from Batch Generation](./docs/screenshots/example2.png)
+
+### Additional Features
+
+#### Fill-in Images
+Need to add an image for a scene that was missed or want to try a different take? The `Generate a single fill-in image` option lets you quickly create a new illustration for any chapter without re-running the whole batch.
+
+![Fill-in Image](./docs/screenshots/06Fill-In.png)
+
+**From a Fill-in Prompt**
+An example from the 'fill-in' feature, allowing for more specific, user-directed scenes.
+> A group of people inside of a spaceship looking at planets
+
+![Example from Fill-in Prompt](./docs/screenshots/example1.png)
+
+#### Fine-Tuning with the Test Suite
+Before a long run, you can use the Testing Suites to fine-tune your results. The Chunking Test lets you see how your live book data is chunked and what prompts are generated, allowing you to perfect your `prompt_template.txt`.
+
+![Testing Suite](./docs/screenshots/02TestSuite.png)
+
+
+
+## Models used:
+
+[Juggernaut XL](https://civitai.com/models/133005)
+
+[Hyperdetailed Colored Pencil](https://civitai.com/models/1155749)
