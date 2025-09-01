@@ -3,7 +3,8 @@
 # =============================================================================
 # Ignore all personal books and generated project output.
 # This ensures that your personal data is NEVER committed to the repository.
-Books/
+Books/*
+!Books/.gitkeep
 Illuminations/
 
 # It is highly recommended to provide a template for the global config
