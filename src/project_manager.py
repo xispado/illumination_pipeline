@@ -61,12 +61,32 @@ def create_project_structure(epub_name):
         print(f"  - Converting EPUB...")
         book = epub.read_epub(epub_path)
         full_text_parts = ["==CHAPTER=="]
+        
         for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
             soup = BeautifulSoup(item.get_content(), 'html.parser')
-            paragraphs = [p.get_text(strip=True) for p in soup.find_all('p') if p.get_text(strip=True)]
-            if paragraphs:
-                full_text_parts.append('\n\n'.join(paragraphs))
+            
+            # --- REFINED LOGIC ---
+            # Find all potential paragraph-level tags.
+            # This is more robust for books that use <div>s instead of <p>s.
+            potential_tags = soup.find_all(['p', 'div'])
+            
+            chapter_paragraphs = []
+            for tag in potential_tags:
+                # This is the crucial check: we only want to extract text from a tag
+                # if it DOES NOT contain another block-level tag within it.
+                # This prevents grabbing text from a container <div> and then
+                # grabbing it again from the <p> tags inside it.
+                if not tag.find(['p', 'div']):
+                    text = tag.get_text(strip=True)
+                    if text:
+                        chapter_paragraphs.append(text)
+
+            if chapter_paragraphs:
+                # Join the collected paragraphs and add the chapter separator
+                full_text_parts.append('\n\n'.join(chapter_paragraphs))
                 full_text_parts.append("\n\n==CHAPTER==\n\n")
+                
+        # Join all the chapter parts together into the final text file
         with open(clean_txt_path, 'w', encoding='utf-8') as f: f.write(''.join(full_text_parts))
         print("  - Conversion successful.")
     except Exception as e:
